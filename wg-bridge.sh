@@ -46,11 +46,15 @@ function disconnect(){
 }
 
 function list(){
-  view_prompt "$(find_configs)"
+  choose=$(view_prompt "$(find_configs)")
+  if [[ "$1" == "show" ]]; then
+    exit 0
+  fi
+  echo $choose | cut -d "|" -f2
 }
 
 function status(){
-  if [ $VERBOSE ]; then
+  if [ "$VERBOSE" ]; then
     sudo wg show all
   else
     sudo wg show interfaces
@@ -76,7 +80,7 @@ while [[ $# -gt 0 ]]; do
       disconnect "$1" || exit 1
       ;;
     -l|--list)
-      list || exit 1
+      list "show" || exit 1
       ;;
     -s|--status)
       status || exit 1

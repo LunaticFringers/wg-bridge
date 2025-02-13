@@ -26,13 +26,19 @@ function get_configuration(){
 }
 
 function view_prompt(){
-  local data=("$@")
+  local paths=()
+  local names=()
 
-  printf "%s\n" "${data[@]}" | yad --list --title="Select a Wireguard configuration" \
-        --column="Files" --width=500 --height=400 --separator=" " --multiple
+  for i in $@; do
+    paths+=("$i")
+    names+=("$(basename "$i")")
+  done
+
+  yad --list --title="Select a Wireguard configuration" \
+        --column="Name" --column="Path" --width=500 --height=400 --multiple $(for i in "${!paths[@]}"; do echo -e "${names[$i]}"; echo -e "${paths[$i]}"; done)
 }
 
 function find_configs(){
-  DIRS=("${@:-${DIRS[@]}}")
+  DIRS=("${DIRS[@]}")
   sudo find "${DIRS[@]}" -type f -name "*.conf" 2>/dev/null
 }
