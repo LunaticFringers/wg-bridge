@@ -14,9 +14,9 @@ function usage(){
   echo ""
   echo "Options:"
   echo "  -h, --help       Show this help message and exit"
-  # echo "  -v, --verbose              Enable verbose mode"
-  echo "  -i, --install    Install WG-Bridge software"
-  echo "  -u, --uninstall  Uninstall WG-Bridge software"
+  echo "  install          Install WG-Bridge software"
+  echo "    -u, --update   Update WG-Bridge software"
+  echo "  uninstall        Uninstall WG-Bridge software"
   echo ""
   exit 1
 }
@@ -120,6 +120,9 @@ fi
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    -h|--help)
+      usage
+      ;;
     install)
       shift
       case "$1" in
