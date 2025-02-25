@@ -6,11 +6,14 @@ export RED="\e[31m"
 export NC="\e[0m"
 
 export user_home=$HOME
-export wgbconf="$user_home/.wgbconf.json"
 export DIRS=("/etc/wireguard")
 export token=false
 export token_uri=""
 
+# not exporting this because it's only used during the installation procedure
+conf=".wgbconf.json"
+
+export wgbconf="$user_home/$conf"
 
 function log_error(){
   echo -e "$RED$1$NC"
@@ -121,9 +124,14 @@ function add_dir_paths(){
     directories+=("$dir")
   done
 
-  jsonarray=$(printf '%s\n' "${directories[@]}" | jq -R . | jq -s .)
+  # Only add the directories if the array is not empty, otherwise create an empty array
+  if [ ${#directories[@]} -gt 0 ]; then
+    jsonarray=$(printf '%s\n' "${directories[@]}" | jq -R . | jq -s .)
+  else
+    jsonarray="[]"
+  fi
 
-  jq --argjson paths "$jsonarray" '.conf_path += $paths' $wgbconf > $wgbconf.tmp
+  jq --argjson paths "$jsonarray" '.conf_path += $paths' $conf > $wgbconf.tmp
   sudo mv $wgbconf.tmp $wgbconf
   sudo chown $USER:$USER $wgbconf
   sudo chmod 644 $wgbconf
