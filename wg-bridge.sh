@@ -114,7 +114,11 @@ function remove_path(){
 
 function list_path(){
   mapfile -t items < <(load_paths)
-   # Print the numbered list
+  # Print the numbered list
+  if [ ${#items[@]} -eq 0 ]; then
+    echo "No paths available"
+    exit 0
+  fi
   echo "Available paths:"
   for i in "${!items[@]}"; do
     echo "  $((i + 1)). ${items[i]}"
