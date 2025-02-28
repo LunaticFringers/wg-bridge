@@ -10,6 +10,7 @@ export wgbconf="$user_home/.wgbconf.json"
 export DIRS=("/etc/wireguard")
 export token=false
 export token_uri=""
+procerrorlog=$(mktemp)
 
 
 function log_error(){
@@ -20,6 +21,15 @@ function log_warn(){
 }
 function log_info(){
   echo -e "$CYAN$1$NC"
+}
+function log_file(){
+  local date=$(date '+%d-%m-%Y %H:%M:%S')
+  local first=true
+  while IFS= read -r line; do
+      echo "[$date] :: $line"
+  done < $procerrorlog >> "/var/log/wg-bridge/wgb.log"
+
+  return $1 # return the exit status of previous process
 }
 
 function get_error_msg(){
@@ -55,7 +65,7 @@ function view_prompt(){
 }
 
 function find_configs(){
-  sudo find "${DIRS[@]}" -type f -name "*.conf" 2>/dev/null
+  sudo find "${DIRS[@]}" -type f -name "*.conf" 2>$procerrorlog ; log_file $?
 }
 
 function handle_token() {
