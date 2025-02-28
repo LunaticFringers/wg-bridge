@@ -35,13 +35,18 @@ function connect(){
   if [ "$1" != "" ]; then
     conf=$1
   else
-    conf=$(list)
+    conf=$(get_conf_by_status false)
   fi
   if [ "$conf" != "" ]; then
     istoken=$(handle_token "$conf")
-    sudo wg-quick up "$conf"
+    out=$(sudo wg-quick up "$conf" 2>&1)
+    if [ $? -ne 0 ]; then
+      log_error "Connection to '$conf' failed"
+      exit 4
+    fi
     if [ $istoken ]; then
       uri=$(get_uri "$conf")
+      set_connection_status "$conf" true
       xdg-open "$uri" > /dev/null 2>&1 &
     fi
   fi
@@ -51,17 +56,25 @@ function disconnect(){
   if [ "$1" != "" ]; then
     conf=$1
   else
-    conf=$(list)
+    conf=$(list "$(get_conf_by_status true)")
   fi
   if [ "$conf" != "" ]; then
-    wg-quick down "$conf"
+    out=$(sudo wg-quick down "$conf" 2>&1)
+    if [ $? -ne 0 ]; then
+      log_error "Disconnection from '$conf' failed"
+      exit 4
+    fi
+    set_connection_status "$conf" false
   fi
 }
 
 function list(){
-  choose=$(view_prompt "$(find_configs)")
   if [[ "$1" == "show" ]]; then
-    exit 0
+    view_prompt "$(find_configs)"
+  elif [ "$1" != "show" ] && [ "$1" != "" ]; then
+    choose=$(view_prompt "$1")
+  else
+    choose=$(view_prompt "$(find_configs)")
   fi
   echo $choose | cut -d "|" -f2
 }
