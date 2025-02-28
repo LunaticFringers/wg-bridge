@@ -1,4 +1,11 @@
 #!/bin/bash
+# =============================================================================
+# Script Name    : utils.sh
+# Description    : Set of utility functions used by various other scripts
+# Author         : Luca Canessa (luca-c-xcv)
+# =============================================================================
+# Usage          :
+# =============================================================================
 
 export CYAN="\e[36m"
 export YELLOW="\e[33m"
@@ -11,23 +18,50 @@ export DIRS=("/etc/wireguard")
 export token=false
 export token_uri=""
 
-
+# -----------------------------------------------------------------------------
+# Purpose : Prints in STDOUT an error message
+# Args    : Message to print
+# Returns :
+# -----------------------------------------------------------------------------
 function log_error(){
   echo -e "$RED$1$NC"
 }
+
+# -----------------------------------------------------------------------------
+# Purpose : Prints in STDOUT a warning message
+# Args    : Message to print
+# Returns :
+# -----------------------------------------------------------------------------
 function log_warn(){
   echo -e "$YELLOW$1$NC"
 }
+
+# -----------------------------------------------------------------------------
+# Purpose : Prints in STDOUT an information message
+# Args    : Message to print
+# Returns :
+# -----------------------------------------------------------------------------
 function log_info(){
   echo -e "$CYAN$1$NC"
 }
 
+# -----------------------------------------------------------------------------
+# Purpose : Get error message by its code
+# Args    : Error Code
+# Returns : Error Message
+# -----------------------------------------------------------------------------
 function get_error_msg(){
   errors="$(jq -r '.error_codes' "$wgbconf")"
 
   echo $errors | jq -r "$1"
 }
 
+# -----------------------------------------------------------------------------
+# Purpose : Set the environment using the configuration found in the
+#           configuration file ".wgbconf.json"
+# Args    :
+# Returns :
+# -----------------------------------------------------------------------------
 function get_configuration(){
   if [ -f "$wgbconf" ]; then
     while IFS= read -r item; do
@@ -41,6 +75,11 @@ function get_configuration(){
   fi
 }
 
+# -----------------------------------------------------------------------------
+# Purpose : Open a YAD window with a list of VPN configurations
+# Args    : Array of VPN configrations to display
+# Returns :
+# -----------------------------------------------------------------------------
 function view_prompt(){
   local paths=()
   local names=()
@@ -54,10 +93,21 @@ function view_prompt(){
         --column="Name" --column="Path" --width=500 --height=400 --multiple $(for i in "${!paths[@]}"; do echo -e "${names[$i]}"; echo -e "${paths[$i]}"; done)
 }
 
+# -----------------------------------------------------------------------------
+# Purpose : Searches the VPN configurations in the listed path in
+#           '.wgbconf.json'
+# Args    :
+# Returns : The list of paths to VPN configurations
+# -----------------------------------------------------------------------------
 function find_configs(){
   sudo find "${DIRS[@]}" -type f -name "*.conf" 2>/dev/null
 }
 
+# -----------------------------------------------------------------------------
+# Purpose : Handles 2FA for connection that require it
+# Args    : VPN configuration path
+# Returns : true if connection use 2FA, false otherwise
+# -----------------------------------------------------------------------------
 function handle_token() {
   local conf="$1"
   local istoken=""
@@ -98,14 +148,23 @@ function handle_token() {
   fi
 }
 
-
+# -----------------------------------------------------------------------------
+# Purpose : Get the URI to enter PIN for 2FA
+# Args    : VPN configuration path
+# Returns : The URI
+# -----------------------------------------------------------------------------
 function get_uri(){
   local conf="$1"
   uri=$(jq -r --arg value "$conf" '.confs[] | select(.path==$value) | .uri' "$wgbconf")
   echo $uri
 }
 
-
+# -----------------------------------------------------------------------------
+# Purpose : Adds a set of paths in the configuration file used to search the
+#           VPN configurations
+# Args    :
+# Returns :
+# -----------------------------------------------------------------------------
 function add_dir_paths(){
   log_warn "Enter the path to configuration files (or empty line to finish)"
   while true; do
@@ -129,7 +188,12 @@ function add_dir_paths(){
   sudo chmod 644 $wgbconf
 }
 
-
+# -----------------------------------------------------------------------------
+# Purpose : Reads the json file to get the paths to search for VPN
+#           configurations
+# Args    :
+# Returns :
+# -----------------------------------------------------------------------------
 function load_paths(){
   # Read JSON array into a Bash array
   mapfile -t items < <(jq -r '.conf_path[]' $wgbconf)
@@ -139,6 +203,11 @@ function load_paths(){
   done
 }
 
+# -----------------------------------------------------------------------------
+# Purpose : Get the VPN configurations path by their status
+# Args    : status
+# Returns : array with the VPN configurations path
+# -----------------------------------------------------------------------------
 function get_conf_by_status(){
   local status="$1"
   mapfile -t connected < <(jq -r --argjson stat "$status" '.confs[] | select((.connected == $stat) or ($stat == false and .connected == null)) | .path' "$wgbconf")
@@ -148,7 +217,11 @@ function get_conf_by_status(){
   done
 }
 
-
+# -----------------------------------------------------------------------------
+# Purpose : Set the VPN configuration path and its status
+# Args    : status, configuration path
+# Returns :
+# -----------------------------------------------------------------------------
 function set_connection_status(){
   local conf="$1"
   local status=$2
