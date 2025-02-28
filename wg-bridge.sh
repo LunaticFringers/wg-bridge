@@ -1,8 +1,19 @@
 #!/bin/bash
-
+# =============================================================================
+# Script Name    : wg-bridge.sh
+# Description    : Executes commands to handle Wireguard connections
+# =============================================================================
+# Usage          : ./wg-bridge.sh [connect, disconnect,list,status,path]
+# =============================================================================
 source "$(dirname "$(realpath "${BASH_SOURCE[0]}")")/utils.sh"
 
 
+
+# -----------------------------------------------------------------------------
+# Purpose : Prints the usage message
+# Args    :
+# Returns :
+# -----------------------------------------------------------------------------
 function usage(){
   echo "Usage: $(basename "$0") [OPTIONS] [COMMAND] <ARGUMENT>"
   echo ""
@@ -28,7 +39,11 @@ function usage(){
   exit 1
 }
 
-
+# -----------------------------------------------------------------------------
+# Purpose : Establish a connection to a VPN using a specific configuration
+# Args    : Optionally takes the path to the configuration file
+# Returns :
+# -----------------------------------------------------------------------------
 function connect(){
   local istoken=""
   local uri=""
@@ -52,6 +67,11 @@ function connect(){
   fi
 }
 
+# -----------------------------------------------------------------------------
+# Purpose : Close the connection to a VPN using its specific configuration
+# Args    : Optionally takes the path to the configuration file
+# Returns :
+# -----------------------------------------------------------------------------
 function disconnect(){
   if [ "$1" != "" ]; then
     conf=$1
@@ -68,6 +88,11 @@ function disconnect(){
   fi
 }
 
+# -----------------------------------------------------------------------------
+# Purpose : Prints the list of configuration files available in the system
+# Args    : show - used only to display the list
+# Returns : The chosen configuration file path
+# -----------------------------------------------------------------------------
 function list(){
   if [[ "$1" == "show" ]]; then
     view_prompt "$(find_configs)"
@@ -79,6 +104,11 @@ function list(){
   echo $choose | cut -d "|" -f2
 }
 
+# -----------------------------------------------------------------------------
+# Purpose : Shows the status of the VPN connection
+# Args    :
+# Returns :
+# -----------------------------------------------------------------------------
 function status(){
   if [ "$VERBOSE" ]; then
     sudo wg show all
@@ -87,11 +117,22 @@ function status(){
   fi
 }
 
+# -----------------------------------------------------------------------------
+# Purpose : Adds a set of paths in the configuration file used to search the
+#           VPN configurations
+# Args    :
+# Returns :
+# -----------------------------------------------------------------------------
 function add_path(){
   add_dir_paths
 }
 
-
+# -----------------------------------------------------------------------------
+# Purpose : Removes a path from configuration file used to search the VPN
+#           configurations
+# Args    :
+# Returns :
+# -----------------------------------------------------------------------------
 function remove_path(){
   mapfile -t items < <(load_paths)
 
@@ -125,6 +166,11 @@ function remove_path(){
   fi
 }
 
+# -----------------------------------------------------------------------------
+# Purpose : Prints the available paths used to search the configuration file
+# Args    :
+# Returns :
+# -----------------------------------------------------------------------------
 function list_path(){
   mapfile -t items < <(load_paths)
   # Print the numbered list
