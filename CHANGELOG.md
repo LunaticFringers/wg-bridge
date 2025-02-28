@@ -23,3 +23,4 @@ and this project adheres to
 - Handler for configuration file during installation and upgrade
 - Options `connect`, `disconnect`, `list` and `status` to commands
 - 2FA manager that allow to manage it on a connection-by-connection basis
+- Logging errors in the default Linux log directory
