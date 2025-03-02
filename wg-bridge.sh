@@ -35,11 +35,11 @@ function connect(){
   if [ "$1" != "" ]; then
     conf=$1
   else
-    conf=$(get_conf_by_status false)
+    conf=$(list "$(get_conf_by_status false)")
   fi
   if [ "$conf" != "" ]; then
     istoken=$(handle_token "$conf")
-    out=$(sudo wg-quick up "$conf" 2>&1)
+    out=$(sudo wg-quick up "$conf" 2>$procerrorlog ; log_file $?)
     if [ $? -ne 0 ]; then
       log_error "Connection to '$conf' failed"
       exit 4
@@ -47,7 +47,7 @@ function connect(){
     if [ $istoken ]; then
       uri=$(get_uri "$conf")
       set_connection_status "$conf" true
-      xdg-open "$uri" > /dev/null 2>&1 &
+      xdg-open "$uri" > /dev/null 2>$procerrorlog ; log_file $? &
     fi
   fi
 }
@@ -59,7 +59,7 @@ function disconnect(){
     conf=$(list "$(get_conf_by_status true)")
   fi
   if [ "$conf" != "" ]; then
-    out=$(sudo wg-quick down "$conf" 2>&1)
+    out=$(sudo wg-quick down "$conf" 2>$procerrorlog ; log_file $?)
     if [ $? -ne 0 ]; then
       log_error "Disconnection from '$conf' failed"
       exit 4
