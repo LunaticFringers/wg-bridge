@@ -146,3 +146,21 @@ function load_paths(){
     echo "$item"
   done
 }
+
+function get_conf_by_status(){
+  local status="$1"
+  mapfile -t connected < <(jq -r --argjson stat "$status" '.confs[] | select((.connected == $stat) or ($stat == false and .connected == null)) | .path' "$wgbconf")
+
+  for item in "${connected[@]}"; do
+    echo "$item"
+  done
+}
+
+
+function set_connection_status(){
+  local conf="$1"
+  local status=$2
+  jq --arg target "$conf" --argjson status "$status" '(.confs[] | select(.path==$target)) += {connected: $status}' "$wgbconf" > $wgbconf.tmp
+
+  mv $wgbconf.tmp $wgbconf
+}

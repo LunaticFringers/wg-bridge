@@ -27,4 +27,4 @@ repos:
     hooks:
       - id: shellcheck
         files: \.sh$
-        args: ["--severity=warning"]
+        args: ["--severity=error"]
