@@ -3,8 +3,6 @@
 source "$(dirname "${BASH_SOURCE[0]}")/utils.sh"
 
 user_home=$HOME
-conf=".wgbconf.json"
-wgbconf="$user_home/$conf"
 tool_dir=/opt/wg-bridge
 cmd=/usr/bin/wgb
 
