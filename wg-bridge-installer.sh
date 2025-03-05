@@ -1,4 +1,10 @@
 #!/bin/bash
+# =============================================================================
+# Script Name    : wg-bridge-installer.sh
+# Description    : Installs the wg-brige software
+# =============================================================================
+# Usage          : ./wg-bridge-installer.sh [install, uninstall]
+# =============================================================================
 
 source "$(dirname "${BASH_SOURCE[0]}")/utils.sh"
 
@@ -7,6 +13,11 @@ tool_dir=/opt/wg-bridge
 cmd=/usr/bin/wgb
 
 
+# -----------------------------------------------------------------------------
+# Purpose : Prints the usage message
+# Args    :
+# Returns :
+# -----------------------------------------------------------------------------
 function usage(){
   echo "Usage: $(basename "$0") [OPTIONS]"
   echo ""
@@ -19,11 +30,21 @@ function usage(){
   exit 1
 }
 
+# -----------------------------------------------------------------------------
+# Purpose : Installs the software dependences
+# Args    :
+# Returns :
+# -----------------------------------------------------------------------------
 function install_dep(){
   sudo apt update -qq
   sudo apt install -qq -y wireguard yad jq
 }
 
+# -----------------------------------------------------------------------------
+# Purpose : Installs the all scripts
+# Args    :
+# Returns :
+# -----------------------------------------------------------------------------
 function _install_sw(){
   if [ "$update" == false ]; then
     log_info "Installing wg-bridge . . ."
@@ -40,7 +61,11 @@ function _install_sw(){
   fi
 }
 
-
+# -----------------------------------------------------------------------------
+# Purpose : Entry point of installation process
+# Args    :
+# Returns :
+# -----------------------------------------------------------------------------
 function install(){
   log_info "Installing dependency . . ."
   install_dep
@@ -74,6 +99,11 @@ function install(){
 }
 
 
+# -----------------------------------------------------------------------------
+# Purpose : Entry point of the uninstallation process
+# Args    :
+# Returns :
+# -----------------------------------------------------------------------------
 function uninstall(){
   log_info "Uninstalling wg-bridge . . ."
   if [ -f $wgbconf ]; then
