@@ -82,6 +82,8 @@ function install(){
         _install_sw
         mv "$wgbconf" "$wgbconf.bak"
         jq --slurpfile customer "$wgbconf.bak" '.conf_path |= (. + $customer[0].conf_path)' "$conf" > "$wgbconf"
+        jq --slurpfile customer "$wgbconf.bak" '.confs |= (. + $customer[0].confs)' "$wgbconf" > "$wgbconf.tmp"
+        mv "$wgbconf.tmp" "$wgbconf"
       else
         log_warn "Software already installed"
         exit 1
