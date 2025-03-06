@@ -26,9 +26,9 @@ function install_dep(){
 
 function _install_sw(){
   if [ "$update" == false ]; then
-    log_info "Installing wg-bridge . . ."
+    print_info "Installing wg-bridge . . ."
   else
-    log_info "Updating wg-bridge . . ."
+    print_info "Updating wg-bridge . . ."
   fi
   if [ ! -d "$tool_dir" ]; then
     sudo mkdir $tool_dir
@@ -38,17 +38,19 @@ function _install_sw(){
   if [ ! -f $cmd ]; then
     sudo ln -s $tool_dir/wg-bridge.sh $cmd
   fi
+
+  sudo mkdir /var/log/wg-bridge
 }
 
 
 function install(){
-  log_info "Installing dependency . . ."
+  print_info "Installing dependency . . ."
   install_dep
 
   if [ ! -f "$wgbconf" ]; then
     _install_sw
 
-    log_info "Installing configuration . . ."
+    print_info "Installing configuration . . ."
 
     add_dir_paths
   else
@@ -58,7 +60,7 @@ function install(){
         mv "$wgbconf" "$wgbconf.bak"
         jq --slurpfile customer "$wgbconf.bak" '.conf_path |= (. + $customer[0].conf_path)' "$conf" > "$wgbconf"
       else
-        log_warn "Software already installed"
+        print_warn "Software already installed"
         exit 1
       fi
     fi
@@ -70,12 +72,12 @@ function install(){
   sudo cp "wg-bridge-completion.sh" "/etc/bash_completion.d/"
   sudo chmod 755 "/etc/bash_completion.d/wg-bridge-completion.sh"
 
-  log_info "Done"
+  print_info "Done"
 }
 
 
 function uninstall(){
-  log_info "Uninstalling wg-bridge . . ."
+  print_info "Uninstalling wg-bridge . . ."
   if [ -f $wgbconf ]; then
     sudo rm $wgbconf
   fi
@@ -88,7 +90,7 @@ function uninstall(){
   if [ -f "/etc/bash_completion.d/wg-bridge-completion.sh" ]; then
     sudo rm "/etc/bash_completion.d/wg-bridge-completion.sh"
   fi
-  log_info "Done"
+  print_info "Done"
 }
 
 ###############################################################################

@@ -9,20 +9,29 @@ export user_home=$HOME
 export DIRS=("/etc/wireguard")
 export token=false
 export token_uri=""
+procerrorlog=$(mktemp)
 
 # not exporting this because it's only used during the installation procedure
 conf=".wgbconf.json"
 
 export wgbconf="$user_home/$conf"
 
-function log_error(){
+function print_error(){
   echo -e "$RED$1$NC"
 }
-function log_warn(){
+function print_warn(){
   echo -e "$YELLOW$1$NC"
 }
-function log_info(){
+function print_info(){
   echo -e "$CYAN$1$NC"
+}
+function log_to_file(){
+  local date=$(date '+%d-%m-%Y %H:%M:%S')
+  while IFS= read -r line; do
+      echo "[$date] :: $line"
+  done < $procerrorlog >> "/var/log/wg-bridge/wgb.log"
+
+  return $1 # return the exit status of previous process
 }
 
 function get_error_msg(){
@@ -39,7 +48,7 @@ function get_configuration(){
     token=$(jq -r '.token' "$wgbconf")
     token_uri=$(jq -r '.token_uri' "$wgbconf")
   else
-    log_error "{000} Something goes wrong. Reinstall the tool."
+    print_error "{000} Something goes wrong. Reinstall the tool."
     exit 1
   fi
 }
@@ -58,7 +67,7 @@ function view_prompt(){
 }
 
 function find_configs(){
-  sudo find "${DIRS[@]}" -type f -name "*.conf" 2>/dev/null
+  sudo find "${DIRS[@]}" -type f -name "*.conf" 2>$procerrorlog ; log_to_file $?
 }
 
 function handle_token() {
@@ -110,7 +119,7 @@ function get_uri(){
 
 
 function add_dir_paths(){
-  log_warn "Enter the path to configuration files (or empty line to finish)"
+  print_warn "Enter the path to configuration files (or empty line to finish)"
   while true; do
     # Get the directory path from the user
     read -rp "Path: " dir
