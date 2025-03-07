@@ -50,7 +50,7 @@ function connect(){
   if [ "$1" != "" ]; then
     conf=$1
   else
-    conf=$(get_conf_by_status false)
+    conf=$(list "$(get_conf_by_status false)")
   fi
   if [ "$conf" != "" ]; then
     istoken=$(handle_token "$conf")
