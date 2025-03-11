@@ -5,8 +5,7 @@
 # =============================================================================
 # Usage          : ./wg-bridge.sh [connect, disconnect,list,status,path]
 # =============================================================================
-# source "$(dirname "$(realpath "${BASH_SOURCE[0]}")")/utils.sh"
-source "./utils.sh"
+source "$(dirname "$(realpath "${BASH_SOURCE[0]}")")/utils.sh"
 
 
 
