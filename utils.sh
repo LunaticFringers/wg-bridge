@@ -63,7 +63,7 @@ function get_error_msg(){
 # Args    :
 # Returns :
 # -----------------------------------------------------------------------------
-function get_configuration(){
+function init_configuration(){
   if [ -f "$wgbconf" ]; then
     while IFS= read -r item; do
       DIRS+=("$item")

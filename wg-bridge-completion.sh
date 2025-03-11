@@ -6,7 +6,7 @@ wgbconf="$user_home/.wgbconf.json"
 DIRS=("/etc/wireguard")
 
 # Load user-configured paths
-get_configuration(){
+init_configuration(){
   while IFS= read -r item; do
     DIRS+=("$item")
   done < <(jq -r '.conf_path[]' "$wgbconf" 2>/dev/null)
@@ -14,7 +14,7 @@ get_configuration(){
 
 # Find available configurations
 find_configs(){
-  get_configuration
+  init_configuration
   sudo find "${DIRS[@]}" -type f -name "*.conf" 2>/dev/null
 }
 
