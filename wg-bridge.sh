@@ -5,7 +5,8 @@
 # =============================================================================
 # Usage          : ./wg-bridge.sh [connect, disconnect,list,status,path]
 # =============================================================================
-source "$(dirname "$(realpath "${BASH_SOURCE[0]}")")/utils.sh"
+# source "$(dirname "$(realpath "${BASH_SOURCE[0]}")")/utils.sh"
+source "./utils.sh"
 
 
 
@@ -50,7 +51,18 @@ function connect(){
   if [ "$1" != "" ]; then
     conf=$1
   else
-    conf=$(list "$(get_conf_by_status false)")
+    # get configurations connected
+    IFS=$'\n' read -r -d '' -a avail < <(get_conf_by_status true; printf '\0')
+
+    # Get all configurations
+    all=($(find_configs))
+
+    # Construct regex pattern safely
+    pattern=$(printf "|%s" "${avail[@]}")
+    pattern=${pattern:1}  # Remove leading "|"
+
+    # Remove from all configurations those connected
+    conf=$(list "$(printf "%s\n" "${all[@]}" | grep -v -E "^(${pattern})$")")
   fi
   if [ "$conf" != "" ]; then
     istoken=$(handle_token "$conf")
@@ -194,7 +206,7 @@ if [ $# -eq 0 ]; then
   exit 2
 fi
 
-get_configuration
+init_configuration
 
 OPTIONS=vh
 LONGOPTIONS=verbose,help
