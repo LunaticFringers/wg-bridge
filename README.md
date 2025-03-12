@@ -10,7 +10,7 @@
 To install **WG-Bridge**, use:
 
 ```sh
-./wg-bridge-installation install
+./wg-bridge-installer.sh install
 ```
 
 ## UNINSTALLATION
@@ -18,7 +18,7 @@ To install **WG-Bridge**, use:
 To remove **WG-Bridge**, use:
 
 ```sh
-./wg-bridge-installation uninstall
+./wg-bridge-installer.sh uninstall
 ```
 
 ## UPDATE
@@ -26,13 +26,13 @@ To remove **WG-Bridge**, use:
 To remove **WG-Bridge**, use:
 
 ```sh
-./wg-bridge-installation install --update
+./wg-bridge-installer.sh install --update
 ```
 
 or
 
 ```sh
-./wg-bridge-installation install -u
+./wg-bridge-installer.sh install -u
 ```
 
 ## SYNOPSIS
@@ -168,10 +168,16 @@ WireGuard configuration files.
 ```json
 {
     "conf_path": ["/etc/wireguard/", "/home/user/"],
+    "confs":[
+      {
+        "path": "/etc/wireguard/test.conf",
+        "token": false,
+        "uri": "",
+        "connected": false
+      }
+    ]
     "error_codes": {
         "000": "Missing wgb configuration"
-    },
-    "token": false,
-    "token_uri": ""
+    }
 }
 ```
