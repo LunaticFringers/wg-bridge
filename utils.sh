@@ -15,6 +15,7 @@ export user_home=$HOME
 export DIRS=("/etc/wireguard")
 export token=false
 export token_uri=""
+procerrorlog=$(mktemp)
 
 conf=".wgbconf.json" # not exporting this because it's only used during the installation procedure
 export wgbconf="$user_home/$conf"
@@ -24,7 +25,7 @@ export wgbconf="$user_home/$conf"
 # Args    : Message to print
 # Returns :
 # -----------------------------------------------------------------------------
-function log_error(){
+function print_error(){
   echo -e "$RED$1$NC"
 }
 
@@ -33,7 +34,7 @@ function log_error(){
 # Args    : Message to print
 # Returns :
 # -----------------------------------------------------------------------------
-function log_warn(){
+function print_warn(){
   echo -e "$YELLOW$1$NC"
 }
 
@@ -42,8 +43,24 @@ function log_warn(){
 # Args    : Message to print
 # Returns :
 # -----------------------------------------------------------------------------
-function log_info(){
+function print_info(){
   echo -e "$CYAN$1$NC"
+}
+
+#------------------------------------------------------------------------------
+# Purpose : Prints in the default log file a verbose output to help the
+#           debugging
+# Args    : The exit status of the previous process
+# Returns : The exit status of the previous process
+#------------------------------------------------------------------------------
+function log_to_file(){
+  local date
+  while IFS= read -r line; do
+    date=$(date '+%d-%m-%Y %H:%M:%S')
+    echo "[$date] :: $line"
+  done < $procerrorlog >> "/var/log/wg-bridge/wgb.log"
+
+  return $1 # return the exit status of previous process
 }
 
 # -----------------------------------------------------------------------------
@@ -71,7 +88,7 @@ function init_configuration(){
     token=$(jq -r '.token' "$wgbconf")
     token_uri=$(jq -r '.token_uri' "$wgbconf")
   else
-    log_error "{000} Something goes wrong. Reinstall the tool."
+    print_error "{000} Something goes wrong. Reinstall the tool."
     exit 1
   fi
 }
@@ -101,7 +118,7 @@ function view_prompt(){
 # Returns : The list of paths to VPN configurations
 # -----------------------------------------------------------------------------
 function find_configs(){
-  sudo find "${DIRS[@]}" -type f -name "*.conf" 2>/dev/null
+  sudo find "${DIRS[@]}" -type f -name "*.conf" 2>$procerrorlog ; log_to_file $?
 }
 
 # -----------------------------------------------------------------------------
@@ -167,7 +184,7 @@ function get_uri(){
 # Returns :
 # -----------------------------------------------------------------------------
 function add_dir_paths(){
-  log_warn "Enter the path to configuration files (or empty line to finish)"
+  print_warn "Enter the path to configuration files (or empty line to finish)"
   while true; do
     # Get the directory path from the user
     read -rp "Path: " dir

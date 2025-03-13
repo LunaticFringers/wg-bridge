@@ -5,8 +5,7 @@
 # =============================================================================
 # Usage          : ./wg-bridge.sh [connect, disconnect,list,status,path]
 # =============================================================================
-# source "$(dirname "$(realpath "${BASH_SOURCE[0]}")")/utils.sh"
-source "./utils.sh"
+source "$(dirname "$(realpath "${BASH_SOURCE[0]}")")/utils.sh"
 
 
 
@@ -66,16 +65,17 @@ function connect(){
   fi
   if [ "$conf" != "" ]; then
     istoken=$(handle_token "$conf")
-    out=$(sudo wg-quick up "$conf" 2>&1)
+    out=$(sudo wg-quick up "$conf" 2>$procerrorlog ; log_to_file $?)
     if [ $? -ne 0 ]; then
-      log_error "Connection to '$conf' failed"
+      print_error "Connection to '$conf' failed"
       exit 4
     fi
     if [ $istoken ]; then
       uri=$(get_uri "$conf")
       set_connection_status "$conf" true
-      xdg-open "$uri" > /dev/null 2>&1 &
+      xdg-open "$uri" > /dev/null 2>$procerrorlog ; log_to_file $? &
     fi
+    print_info "Connected"
   fi
 }
 
@@ -91,12 +91,13 @@ function disconnect(){
     conf=$(list "$(get_conf_by_status true)")
   fi
   if [ "$conf" != "" ]; then
-    out=$(sudo wg-quick down "$conf" 2>&1)
+    out=$(sudo wg-quick down "$conf" 2>$procerrorlog ; log_to_file $?)
     if [ $? -ne 0 ]; then
-      log_error "Disconnection from '$conf' failed"
+      print_error "Disconnection from '$conf' failed"
       exit 4
     fi
     set_connection_status "$conf" false
+    print_info "Disconnected"
   fi
 }
 
@@ -149,7 +150,7 @@ function remove_path(){
   mapfile -t items < <(load_paths)
 
   if [ ${#items[@]} -eq 0 ]; then
-    log_info "No paths available"
+    print_warn "No paths available"
     exit 0
   fi
 
@@ -172,9 +173,9 @@ function remove_path(){
     jq --arg item "$item_to_remove" 'del(.conf_path[] | select(. ==$item))' "$wgbconf" > "$wgbconf.tmp"
     sudo mv "$wgbconf.tmp" "$wgbconf"
 
-    log_info "Item '$item_to_remove' has been removed from configuration file."
+    print_info "Item '$item_to_remove' has been removed from configuration file."
   else
-    log_warn "Invalid selection."
+    print_error "Invalid selection."
   fi
 }
 
