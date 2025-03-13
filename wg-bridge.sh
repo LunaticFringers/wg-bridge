@@ -103,16 +103,19 @@ function disconnect(){
 
 # -----------------------------------------------------------------------------
 # Purpose : Prints the list of configuration files available in the system
-# Args    : show - used only to display the list
+#           or a list passed as arguments
+# Args    : - show - used only to display the full list
+#           - all - used only to display the full list
+#           - array of configurations
+#           'show' and 'all' are two keywords used in diffent way in the code
+#           array of configurations is a list of VPN configuration
 # Returns : The chosen configuration file path
 # -----------------------------------------------------------------------------
 function list(){
-  if [[ "$1" == "show" ]]; then
+  if [ "$1" == "show" ] || [ "$1" == "all" ]; then
     view_prompt "$(find_configs)"
-  elif [ "$1" != "show" ] && [ "$1" != "" ]; then
-    choose=$(view_prompt "$1")
   else
-    choose=$(view_prompt "$(find_configs)")
+    choose=$(view_prompt "$1")
   fi
   echo $choose | cut -d "|" -f2
 }
