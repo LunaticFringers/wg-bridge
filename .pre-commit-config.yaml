@@ -1,5 +1,6 @@
 ---
 repos:
+  # basic commit check
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
@@ -15,16 +16,25 @@ repos:
       - id: check-case-conflict
       - id: check-merge-conflict
 
+  # check for markdown
   - repo: https://github.com/DavidAnson/markdownlint-cli2
     rev: v0.17.2
     hooks:
       - id: markdownlint-cli2
         args: ['--config', '.pre-commit-check/.markdownlint.json']  # Pointing to your custom config
 
-
+  # check for shell scripts
   - repo: https://github.com/koalaman/shellcheck-precommit
     rev: v0.10.0  # or any other version of shellcheck you prefer
     hooks:
       - id: shellcheck
         files: \.sh$
         args: ["--severity=error"]
+
+  # check for rust code
+  - repo: https://github.com/doublify/pre-commit-rust
+    rev: v1.0
+    hooks:
+    - id: fmt
+    - id: cargo-check
+    - id: clippy
