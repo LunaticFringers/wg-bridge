@@ -4,4 +4,5 @@
 // See the LICENSE file in the project root or <https://www.gnu.org/licenses/> for details.
 
 
+pub mod configuration;
 pub mod logger;
