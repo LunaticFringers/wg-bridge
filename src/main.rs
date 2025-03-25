@@ -8,7 +8,7 @@ mod cli;
 mod core;
 mod ui;
 
-use core::{logger::Logger};
+use core::{configuration::AppConf, logger::Logger};
 
 use chrono::Local;
 
@@ -22,6 +22,10 @@ fn main() {
   Logger::init(&format!("./{}.log", date));
   let log = Logger::get();
 
+  // Initializing application
+  AppConf::init();
+  let app_conf: &AppConf = AppConf::get();
+
   // Debugging messages
   #[cfg(debug_assertions)]
   {
@@ -30,6 +34,7 @@ fn main() {
     log.warn("test");
     log.error("test");
     println!("Awaiting log creation");
+    log.debug(&format!("user configuration path: {}", &app_conf.user_conf));
     thread::sleep(Duration::new(2,0));
   }
 }
