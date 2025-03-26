@@ -1,7 +1,7 @@
 ---
 # These are optional metadata elements. Feel free to remove any of them.
-status: proposed
-date: 2025-03-18
+status: accepted
+date: 2025-03-25
 decision-makers:
   - '@luca-c-xcv'
   - '@feed3r'
