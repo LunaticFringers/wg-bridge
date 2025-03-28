@@ -8,6 +8,28 @@ mod cli;
 mod core;
 mod ui;
 
+use core::logger::Logger;
+
+use chrono::Local;
+
+use std::thread;
+use std::time::Duration;
+
+
 fn main() {
-    println!("Welcome to wg-bridge CLI!");
+  // Initializing logger
+  let date = Local::now().format("%Y-%m-%d").to_string();
+  Logger::init(&format!("./{}.log", date));
+  let log = Logger::get();
+
+  // Debugging messages
+  #[cfg(debug_assertions)]
+  {
+    log.debug("test");
+    log.info("test");
+    log.warn("test");
+    log.error("test");
+    println!("Awaiting log creation");
+    thread::sleep(Duration::new(2,0));
+  }
 }

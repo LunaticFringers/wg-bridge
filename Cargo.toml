@@ -10,6 +10,13 @@ repository = "https://github.com/LunaticFringers/wg-bridge"
 categories = ["networking"]
 
 [dependencies]
+
+# date and time operator
+chrono = "0.4.40"
+
+# toml parser
+toml = "0.5"
+
 # cli argument parsing
 clap = "4.5.32"
 
@@ -23,6 +30,7 @@ tokio = "1.44.1"
 log = "0.4.26"
 env_logger = "0.11.7"
 thiserror = "2.0.12"
+flexi_logger = "0.29.8"
 
 # serialization
 serde = "1.0.219"
